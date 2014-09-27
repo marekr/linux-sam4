@@ -1,9 +1,12 @@
 /*
- * Device tree for Energy Micro EFM32 Giant Gecko SoC.
+ * sama5d3.dtsi - Device Tree Include file for SAM4E
  *
- * Documentation available from
- * http://www.silabs.com/Support%20Documents/TechnicalDocs/EFM32GG-RM.pdf
+ *  Copyright (C) 2013 Atmel,(setup borrowed from sama5d3.dtsi)
+ *		  2014 Marek Roszko
+ *
+ * Licensed under GPLv2 or later.
  */
+
 #include "armv7-m.dtsi"
 #include <dt-bindings/pinctrl/at91.h>
 #include <dt-bindings/gpio/gpio.h>
