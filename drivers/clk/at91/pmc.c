@@ -189,6 +189,13 @@ static const struct at91_pmc_caps sama5d3_caps = {
 			  AT91_PMC_CFDEV,
 };
 
+static const struct at91_pmc_caps sam4e_caps = {
+	.available_irqs = AT91_PMC_MOSCS | AT91_PMC_LOCKA | AT91_PMC_MCKRDY |
+			  AT91_PMC_PCK0RDY | AT91_PMC_PCK1RDY | AT91_PMC_PCK2RDY |
+			  AT91_PMC_MOSCSELS | AT91_PMC_MOSCRCS |
+			  AT91_PMC_CFDEV,
+};
+
 static struct at91_pmc *__init at91_pmc_init(struct device_node *np,
 					     void __iomem *regbase, int virq,
 					     const struct at91_pmc_caps *caps)
@@ -410,3 +417,10 @@ static void __init of_sama5d3_pmc_setup(struct device_node *np)
 }
 CLK_OF_DECLARE(sama5d3_clk_pmc, "atmel,sama5d3-pmc",
 	       of_sama5d3_pmc_setup);
+
+static void __init of_sam4e_pmc_setup(struct device_node *np)
+{
+	of_at91_pmc_setup(np, &sam4e_caps);
+}
+CLK_OF_DECLARE(sam4e_clk_pmc, "atmel,sam4e-pmc",
+	       of_sam4e_pmc_setup);
