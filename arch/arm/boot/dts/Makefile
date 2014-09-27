@@ -1,6 +1,7 @@
 ifeq ($(CONFIG_OF),y)
 
 # Keep at91 dtb files sorted alphabetically for each SoC
+dtb-$(CONFIG_ARCH_AT91) += sam4e_ek.dtb
 # rm9200
 dtb-$(CONFIG_ARCH_AT91) += at91rm9200ek.dtb
 dtb-$(CONFIG_ARCH_AT91) += mpa1600.dtb

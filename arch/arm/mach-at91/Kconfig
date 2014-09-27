@@ -30,11 +30,11 @@ config OLD_CLK_AT91
 
 config AT91_SAM9_ALT_RESET
 	bool
-	default !ARCH_AT91X40
+	default !ARCH_AT91X40 && !ARCH_ATSAM4X
 
 config AT91_SAM9G45_RESET
 	bool
-	default !ARCH_AT91X40
+	default !ARCH_AT91X40 && !ARCH_ATSAM4X
 
 config AT91_SAM9_TIME
 	bool
@@ -87,6 +87,10 @@ config SOC_SAM_V7
 	help
 	  Select this if you are using one of Atmel's SAMA5D3 SoC.
 
+config ARCH_ATSAM4X
+	bool "Cortex M4 SAM4"
+	help
+	  Select this if you are using one of Atmel's SAM4E SoC.
 endchoice
 
 comment "Atmel AT91 Processor"
@@ -213,6 +217,25 @@ config MACH_SAMA5_DT
 	depends on SOC_SAMA5
 	select USE_OF
 	select PHYLIB if NETDEVICES
+	help
+	  Select this if you want to experiment device-tree with
+	  an Atmel Evaluation Kit.
+
+
+config MACH_SAM4E_DT
+	bool "Atmel SAM4E with device-tree support"
+	depends on ARCH_ATSAM4X
+	depends on !MMU
+	select USE_OF
+	select ARCH_REQUIRE_GPIOLIB
+	select ARM_NVIC
+	select AUTO_ZRELADDR
+	select CPU_V7M
+	select GENERIC_CLOCKEVENTS
+        select SPARSE_IRQ
+	select USE_OF
+	select HAVE_AT91_USB_CLK
+	select HAVE_AT91_UTMI
 	help
 	  Select this if you want to experiment device-tree with
 	  an Atmel Evaluation Kit.
