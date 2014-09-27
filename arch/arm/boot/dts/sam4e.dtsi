@@ -391,5 +391,28 @@
 				};
 			};
 		};
+
+		rstc@400e1800
+		{
+			compatible = "atmel,at91sam9g45-rstc";
+			reg = <0x400e1800 0x10>;
+		};
+
+		watchdog@400e1850 {
+			compatible = "atmel,at91sam9260-wdt";
+			reg = <0x400e1850 0x10>;
+			interrupts = <4>;
+			atmel,watchdog-type = "hardware";
+			atmel,reset-type = "all";
+			atmel,dbg-halt;
+			atmel,idle-halt;
+			status = "disabled";
+		};
+
+		rtc@400e1860 {
+			compatible = "atmel,at91rm9200-rtc";
+			reg = <0x400e1860 0x30>;
+			interrupts = <2>;
+		};
 	};
 };
