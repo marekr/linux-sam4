@@ -1,0 +1,392 @@
+/*
+ * Device tree for Energy Micro EFM32 Giant Gecko SoC.
+ *
+ * Documentation available from
+ * http://www.silabs.com/Support%20Documents/TechnicalDocs/EFM32GG-RM.pdf
+ */
+#include "armv7-m.dtsi"
+#include <dt-bindings/pinctrl/at91.h>
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/clock/at91.h>
+
+/ {
+	model = "Atmel SAM4E";
+	compatible = "atmel,sam4e";
+
+	aliases {
+		gpio0 = &pioA;
+		gpio1 = &pioB;
+		gpio2 = &pioC;
+		gpio3 = &pioD;
+		gpio4 = &pioE;
+		i2c0 = &i2c0;
+		i2c1 = &i2c1;
+		serial0 = &usart0;
+		serial1 = &usart1;
+	};
+
+	clocks {
+		slow_xtal: slow_xtal {
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <0>;
+		};
+
+		main_xtal: main_xtal {
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <0>;
+		};
+	};
+
+	soc {
+		i2c0: i2c@400a8000 {
+			compatible = "atmel,at91sam9x5-i2c";
+			reg = <0x400a8000 0x4000>;
+			interrupts = <17>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_i2c0>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			clocks = <&twi0_clk>;
+			status = "disabled";
+		};
+
+		i2c1: i2c@400ac000 {
+			compatible = "atmel,at91sam9x5-i2c";
+			reg = <0x400ac000 0x4000>;
+			interrupts = <18>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_i2c1>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			clocks = <&twi1_clk>;
+			status = "disabled";
+		};
+
+		pinctrl@400e0e00 {
+			#address-cells = <1>;
+			#size-cells = <1>;
+			compatible = "atmel,at91rm9200-pinctrl", "simple-bus";
+			ranges = <0x400e0e00 0x400e0e00 0xa00>;
+			atmel,mux-mask = <
+				/*   A          B          C  */
+				0xffe07e1f 0xfffffffb 0xffdf8267	/* pioA */
+				0x0000073f 0x0000603c 0x0000200f	/* pioB */
+				0xffffffff 0xfffcffff 0x00009000	/* pioC */
+				0x0fffffff 0x00000000 0x00000000	/* pioD */
+				0x00000000 0x00000000 0x00000000	/* pioE */
+				>;
+
+			i2c0 {
+				pinctrl_i2c0: i2c0-0 {
+					atmel,pins =
+						<AT91_PIOA 3 AT91_PERIPH_A AT91_PINCTRL_NONE	/* PA3 periph A TWD0 pin, conflicts with NPCS3 */
+						 AT91_PIOA 4 AT91_PERIPH_A AT91_PINCTRL_NONE>;	/* PA4 periph A TWCK0 pin, conflicts with TCLK0 */
+				};
+			};
+
+			i2c1 {
+				pinctrl_i2c1: i2c1-0 {
+					atmel,pins =
+						<AT91_PIOB 4 AT91_PERIPH_A AT91_PINCTRL_NONE	/* PB4 periph B TWD1 pin, conflicts with PWMH2 */
+						 AT91_PIOB 5 AT91_PERIPH_A AT91_PINCTRL_NONE>;	/* PB5 periph B TWCK1 pin, conflicts with PWML0 */
+				};
+			};
+
+			usart0 {
+				pinctrl_usart0: usart0-0 {
+					atmel,pins =
+						<AT91_PIOB 0 AT91_PERIPH_C AT91_PINCTRL_NONE	/* PB0 periph C, conflicts with PWMH0 */
+						 AT91_PIOB 1 AT91_PERIPH_C AT91_PINCTRL_PULL_UP>; /* PB1 periph C with pullup, conflicts with PWMH1 */
+				};
+
+				pinctrl_usart0_rts_cts: usart0_rts_cts-0 {
+					atmel,pins =
+						<AT91_PIOB 2 AT91_PERIPH_C AT91_PINCTRL_NONE	/* PB2 periph C, conflicts with SPI0_NPCS2, CANTX0 */
+						 AT91_PIOB 3 AT91_PERIPH_C AT91_PINCTRL_NONE>;	/* PB3 periph C, conflicts with CANRX0, PCK2 */
+				};
+			};
+
+			usart1 {
+				pinctrl_usart1: usart1-0 {
+					atmel,pins =
+						<AT91_PIOA 21 AT91_PERIPH_A AT91_PINCTRL_NONE	/* PA21 periph A, conflicts with PCK1 */
+						 AT91_PIOA 22 AT91_PERIPH_A AT91_PINCTRL_PULL_UP>;	/* PA22 periph A with pullup, conflicts with NPCS3, NCS2 */
+				};
+
+				pinctrl_usart1_rts_cts: usart1_rts_cts-0 {
+					atmel,pins =
+						<AT91_PIOA 24 AT91_PERIPH_A AT91_PINCTRL_NONE	/* PA23 periph A, conflicts with PWMH1, A20 */
+						 AT91_PIOA 25 AT91_PERIPH_A AT91_PINCTRL_NONE>;	/* PA24 periph A, conflicts with PWMH2, A23 */
+				};
+			};
+
+			pioA: gpio@400e0e00 {
+				compatible = "atmel,at91sam9x5-gpio", "atmel,at91rm9200-gpio";
+				reg = <0x400e0e00 0x100>;
+				interrupts = <9>;
+				#gpio-cells = <2>;
+				gpio-controller;
+				interrupt-controller;
+				#interrupt-cells = <2>;
+				clocks = <&pioA_clk>;
+			};
+
+			pioB: gpio@400e1000 {
+				compatible = "atmel,at91sam9x5-gpio", "atmel,at91rm9200-gpio";
+				reg = <0x400e1000 0x100>;
+				interrupts = <10>;
+				#gpio-cells = <2>;
+				gpio-controller;
+				interrupt-controller;
+				#interrupt-cells = <2>;
+				clocks = <&pioB_clk>;
+			};
+
+			pioC: gpio@400e1200 {
+				compatible = "atmel,at91sam9x5-gpio", "atmel,at91rm9200-gpio";
+				reg = <0x400e1200 0x100>;
+				interrupts = <11>;
+				#gpio-cells = <2>;
+				gpio-controller;
+				interrupt-controller;
+				#interrupt-cells = <2>;
+				clocks = <&pioC_clk>;
+			};
+
+			pioD: gpio@400e1400 {
+				compatible = "atmel,at91sam9x5-gpio", "atmel,at91rm9200-gpio";
+				reg = <0x400e1400 0x100>;
+				interrupts = <12>;
+				#gpio-cells = <2>;
+				gpio-controller;
+				interrupt-controller;
+				#interrupt-cells = <2>;
+				clocks = <&pioD_clk>;
+			};
+
+			pioE: gpio@400e1600 {
+				compatible = "atmel,at91sam9x5-gpio", "atmel,at91rm9200-gpio";
+				reg = <0x400e1600 0x100>;
+				interrupts = <13>;
+				#gpio-cells = <2>;
+				gpio-controller;
+				interrupt-controller;
+				#interrupt-cells = <2>;
+				clocks = <&pioE_clk>;
+			};
+		};
+
+		usart0: serial@400a0000 {
+			compatible = "atmel,at91sam9260-usart";
+			reg = <0x400a0000 0x100>;
+			interrupts = <14>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_usart0>;
+			clocks = <&usart0_clk>;
+			clock-names = "usart";
+			status = "disabled";
+		};
+
+		usart1: serial@400a4000 {
+			compatible = "atmel,at91sam9260-usart";
+			reg = <0x400a4000 0x100>;
+			interrupts = <15>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_usart1>;
+			clocks = <&usart1_clk>;
+			clock-names = "usart";
+			status = "disabled";
+		};
+
+		pmc: pmc@400e0400 {
+			compatible = "atmel,sam4e-pmc";
+			reg = <0x400e0400 0x120>;
+			interrupts = <5>;
+			interrupt-controller;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			#interrupt-cells = <1>;
+
+			main_rc_osc: main_rc_osc {
+				compatible = "atmel,at91sam9x5-clk-main-rc-osc";
+				#clock-cells = <0>;
+				interrupt-parent = <&pmc>;
+				interrupts = <AT91_PMC_MOSCRCS>;
+				clock-frequency = <8000000>;
+				clock-accuracy = <50000000>;
+			};
+
+			main_osc: main_osc {
+				compatible = "atmel,at91rm9200-clk-main-osc";
+				#clock-cells = <0>;
+				interrupt-parent = <&pmc>;
+				interrupts = <AT91_PMC_MOSCS>;
+				clocks = <&main_xtal>;
+			};
+
+			main: mainck {
+				compatible = "atmel,at91sam9x5-clk-main";
+				#clock-cells = <0>;
+				interrupt-parent = <&pmc>;
+				interrupts = <AT91_PMC_MOSCSELS>;
+				clocks = <&main_rc_osc &main_osc>;
+			};
+
+			plla: pllack {
+				compatible = "atmel,at91rm9200-clk-pll";
+				#clock-cells = <0>;
+				interrupt-parent = <&pmc>;
+				interrupts = <AT91_PMC_LOCKA>;
+				clocks = <&main>;
+				reg = <0>;
+				atmel,clk-input-range = <3000000 32000000>;
+				#atmel,pll-clk-output-range-cells = <4>;
+				atmel,pll-clk-output-ranges = <80000000 240000000 0 0>;
+			};
+
+			plladiv: plladivck {
+				compatible = "atmel,at91sam9x5-clk-plldiv";
+				#clock-cells = <0>;
+				clocks = <&plla>;
+			};
+
+			utmi: utmick {
+				compatible = "atmel,at91sam9x5-clk-utmi";
+				#clock-cells = <0>;
+				interrupt-parent = <&pmc>;
+				interrupts = <AT91_PMC_LOCKU>;
+				clocks = <&main>;
+			};
+
+			mck: masterck {
+				compatible = "atmel,at91sam9x5-clk-master";
+				#clock-cells = <0>;
+				interrupt-parent = <&pmc>;
+				interrupts = <AT91_PMC_MCKRDY>;
+				clocks = <&main>, <&plladiv>, <&utmi>;
+				atmel,clk-output-range = <0 120000000>;
+				atmel,clk-divisors = <1 2 4 0>;
+			};
+
+			usb: usbck {
+				compatible = "atmel,at91sam9x5-clk-usb";
+				#clock-cells = <0>;
+				clocks = <&plladiv>, <&utmi>;
+			};
+
+			prog: progck {
+				compatible = "atmel,at91sam9x5-clk-programmable";
+				#address-cells = <1>;
+				#size-cells = <0>;
+				interrupt-parent = <&pmc>;
+				clocks = <&main>, <&plladiv>, <&utmi>, <&mck>;
+
+				prog0: prog0 {
+					#clock-cells = <0>;
+					reg = <0>;
+					interrupts = <AT91_PMC_PCKRDY(0)>;
+				};
+
+				prog1: prog1 {
+					#clock-cells = <0>;
+					reg = <1>;
+					interrupts = <AT91_PMC_PCKRDY(1)>;
+				};
+
+				prog2: prog2 {
+					#clock-cells = <0>;
+					reg = <2>;
+					interrupts = <AT91_PMC_PCKRDY(2)>;
+				};
+			};
+
+			systemck {
+				compatible = "atmel,at91rm9200-clk-system";
+				#address-cells = <1>;
+				#size-cells = <0>;
+
+				udpck: udpck {
+					#clock-cells = <0>;
+					reg = <7>;
+					clocks = <&usb>;
+				};
+
+				pck0: pck0 {
+					#clock-cells = <0>;
+					reg = <8>;
+					clocks = <&prog0>;
+				};
+
+				pck1: pck1 {
+					#clock-cells = <0>;
+					reg = <9>;
+					clocks = <&prog1>;
+				};
+
+				pck2: pck2 {
+					#clock-cells = <0>;
+					reg = <10>;
+					clocks = <&prog2>;
+				};
+			};
+
+			periphck {
+				compatible = "atmel,at91sam9x5-clk-peripheral";
+				#address-cells = <1>;
+				#size-cells = <0>;
+				clocks = <&mck>;
+
+				pioA_clk: pioA_clk {
+					#clock-cells = <0>;
+					reg = <6>;
+				};
+
+				pioB_clk: pioB_clk {
+					#clock-cells = <0>;
+					reg = <7>;
+				};
+
+				pioC_clk: pioC_clk {
+					#clock-cells = <0>;
+					reg = <8>;
+				};
+
+				pioD_clk: pioD_clk {
+					#clock-cells = <0>;
+					reg = <9>;
+				};
+
+				pioE_clk: pioE_clk {
+					#clock-cells = <0>;
+					reg = <10>;
+				};
+
+				usart0_clk: usart0_clk {
+					#clock-cells = <0>;
+					reg = <12>;
+					atmel,clk-output-range = <0 66000000>;
+				};
+
+				usart1_clk: usart1_clk {
+					#clock-cells = <0>;
+					reg = <13>;
+					atmel,clk-output-range = <0 66000000>;
+				};
+
+				twi0_clk: twi0_clk {
+					reg = <18>;
+					#clock-cells = <0>;
+					atmel,clk-output-range = <0 16625000>;
+				};
+
+				twi1_clk: twi1_clk {
+					#clock-cells = <0>;
+					reg = <19>;
+					atmel,clk-output-range = <0 16625000>;
+				};
+			};
+		};
+	};
+};
